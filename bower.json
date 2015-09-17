@@ -1,0 +1,36 @@
+{
+  "name": "angular-datepicker-oldschool",
+  "version": "0.0.0",
+  "homepage": "https://github.com/se-panfilov/angular-datepicker-oldschool",
+  "authors": [
+    "S.Panfilov <se-panfilov@ya.ru> (https://se-panfilov.github.io)"
+  ],
+  "description": "Angular pure datepicker",
+  "main": "angular-datepicker-oldschool.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/se-panfilov/angular-datepicker-oldschool.git"
+  },
+  "bugs": {
+    "url": "https://github.com/se-panfilov/angular-datepicker-oldschool/issues"
+  },
+
+  "dependencies": {
+    "x-date-core": "git@github.com:se-panfilov/x-date-core.git"
+  },
+  "keywords": [
+    "datepicker",
+    "directive",
+    "pure",
+    "angular",
+    "angularjs",
+    "angular.js"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
