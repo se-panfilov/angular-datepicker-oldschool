@@ -77,8 +77,12 @@ function makeJade() {
 function makeJS() {
     ngAnnotate = ngAnnotate || require('gulp-ng-annotate');
     concat = concat || require('gulp-concat');
-
+    order = order || require('gulp-order');
     return gulp.src([src.js, src.coreJs])
+        .pipe(order([
+            'x-date-core.min.js',
+            src.js
+        ]))
         .pipe(concat('view-and-core.js'))
         .pipe(ngAnnotate({remove: true, add: true, single_quotes: true}));
         //.pipe(gulp.dest(dest.dist));
