@@ -7,9 +7,8 @@ var gulp = require('gulp'), concat, rename, uglify, jade, sourcemaps, watch, cha
 var src = {
     styles: 'src/templates/**/*.styl',
     jade: 'src/templates/**/*.jade',
-    html: 'src/templates/**/*.html',
     js: 'src/*.js',
-    coreJs: '/bower_components/x-date-core/dist/x-date-core.min.js'
+    coreJs: 'bower_components/x-date-core/dist/x-date-core.min.js'
 };
 
 var dest = {
@@ -80,8 +79,9 @@ function makeJS() {
     concat = concat || require('gulp-concat');
 
     return gulp.src([src.js, src.coreJs])
-        .pipe(concat('angular-pure-datepicker.js'))
-        .pipe(ngAnnotate({remove: true, add: true, single_quotes: true}))
+        .pipe(concat('view-and-core.js'))
+        .pipe(ngAnnotate({remove: true, add: true, single_quotes: true}));
+        //.pipe(gulp.dest(dest.dist));
 }
 
 function mergeJsWithTemplates(templates, mainJs) {
@@ -129,8 +129,7 @@ gulp.task('watch', function () {
 
     gulp.watch(src.jade, ['js', 'todo']);
     gulp.watch(src.styles, ['stylus', 'todo']);
-    gulp.watch(src.coreJs, ['js', 'todo']);
-    gulp.watch(src.viewJs, ['js', 'todo']);
+    gulp.watch(src.js, ['js', 'todo']);
 });
 
 gulp.task('build', function () {
