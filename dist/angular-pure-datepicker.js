@@ -1,5 +1,397 @@
-"use strict";var Config={isUtc:!1,monthDirection:"asc",daysDirection:"asc",yearsDirection:"desc",daysList:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],monthList:["January","February","March","April","May","June","July","August","September","October","November","December"]},CommonUtils=function(){var t={isValidNumber:function(t){var e=!isNaN(t),r=isFinite(t);return e&&r},getArrayOfNumbers:function(t,e){for(var r=[],n=t;e>=n;n++)r.push(n);return r},intArraySort:function(t,e){function r(t,e){return e-t}switch(e){default:return t.sort(function(t,e){return t-e});case"desc":return t.sort(r)}},getIntArr:function(e){return e||0===e?e?t._getIntArr(e-1).concat(e):[]:void 0}};return t}(),DateUtils=function(t){function e(t,e){var r=new Date(t);return e.call(r)}var r={getDay:function(r){var n=t.isUTC?Date.prototype.getUTCDate:Date.prototype.getDate;return e(r,n)},getDayOfWeek:function(r){var n=t.isUTC?Date.prototype.getUTCDay:Date.prototype.getDay;return e(r,n)},getYear:function(r){var n=t.isUTC?Date.prototype.getUTCFullYear:Date.prototype.getFullYear;return e(r,n)},getMonth:function(r){var n=t.isUTC?Date.prototype.getUTCMonth:Date.prototype.getMonth;return e(r,n)},getDaysInMonth:function(e,r){var n=t.isUTC?Date.prototype.getUTCDate:Date.prototype.getDate;return n.call(new Date(r,e+1,0))},isValidModel:function(t){return!(!t||!t.dt&&0!==t.dt)},isDateUpperStartLimit:function(t,e){return e?t>e:!0},isDateLowerEndLimit:function(t,e){return e?e>t:!0},isDateBetweenLimits:function(t,e,n){return r.isDateUpperStartLimit(t,e)&&r.isDateLowerEndLimit(t,n)}};return r}(Config),LimitsModel=function(t){function e(e,r){function n(e){return s.start.d=t.getDay(e),s.start.m=t.getMonth(e),s.start.y=t.getYear(e),s.start.dt=e,this}function i(e){return s.end.d=t.getDay(e),s.end.m=t.getMonth(e),s.end.y=t.getYear(e),s.end.dt=e,this}function a(){var e=(new Date).getTime();return s.now.d=t.getDay(e),s.now.m=t.getMonth(e),s.now.y=t.getYear(e),s.now.dt=e,this}var s={start:{},end:{},now:{}};return n(e),i(r),a(),s}return e}(DateUtils),DateModel=function(t){function e(e){return this.d=t.getDay(e),this.dow=t.getDayOfWeek(e),this.m=t.getMonth(e),this.y=t.getYear(e),this.dt=e,this.tz=new Date(e).getTimezoneOffset(),this}return e}(DateUtils),YearsUtils=function(t,e,r){var n={getYearsList:function(n,i,a,s){var o=[],u=10,l=s.start.y,d=s.end.y,y=s.now.y,g=t.getYear(a.dt),f=g>y?g:y,c=y>g?g:y;return f+=u-1,c-=u-1,n&&i&&i>n?o=e.getArrayOfNumbers(l,d):n&&i&&n>i?o=e.getArrayOfNumbers(d,l):n&&i&&n===i?o=e.getArrayOfNumbers(l,d):n&&!i?o=e.getArrayOfNumbers(l,f):!n&&i?s.end.y>=s.now.y?o=c-u>d-u?e.getArrayOfNumbers(c,d):e.getArrayOfNumbers(d-(u-1),d):s.end.y>s.now.y&&(o=e.getArrayOfNumbers(d-(u-1),d)):n||i||(o=e.getArrayOfNumbers(c,f)),e.intArraySort(o,r.yearsListDirection)}};return n}(DateUtils,CommonUtils,Config),MonthUtils=function(t,e,r,n){var i={getMonthList:function(e,i,a){var s,o=0,u=11;if(e||i){var l=e?t.start.y===a:!1,d=i?t.end.y===a:!1,y=e?t.start.m:o,g=i?t.end.m:u;s=l&&d?r.getArrayOfNumbers(y,g):l&&!d?r.getArrayOfNumbers(y,u):!l&&d?r.getArrayOfNumbers(o,g):r.getArrayOfNumbers(o,u)}else s=r.getArrayOfNumbers(o,u);return r.intArraySort(s,n.monthListDirection)}};return i}(LimitsModel,DateUtils,CommonUtils,Config),DaysUtils=function(t,e,r,n){var i={getDaysList:function(i,a,s,o){var u,l=1,d=e.getDaysInMonth(o,s);if(i||a){var y=i?t.start.y===s:!1,g=a?t.end.y===s:!1,f=i?t.start.m===o:!1,c=a?t.end.m===o:!1,m=y&&f,D=g&&c,h=i?t.start.d:l,U=a?t.end.d:d;u=m&&D?r.getArrayOfNumbers(h,U):m&&!D?r.getArrayOfNumbers(h,d):!m&&D?r.getArrayOfNumbers(l,U):r.getArrayOfNumbers(l,d)}else u=r.getArrayOfNumbers(l,d);return r.intArraySort(u,n.daysListDirection)}};return i}(LimitsModel,DateUtils,CommonUtils,Config),DataClass=function(t,e,r,n,i,a){function s(t,e,r){var n,i=t.dt>e,s=t.dt===e,o=t.dt>r,u=t.dt===r;return n=new a(i||s||o||u?t.dt:i?i?(new Date).getTime():r:e)}return function(a,o,u){var l={_start:null,_end:null,_limitDates:null},d={selected:{},list:{y:null,m:null,d:null},reloadYearsList:function(){return d.list.y=r.getYearsList(l._start,l._end),this},reloadMonthList:function(){var e=t.getYear(d.selected.dt);return d.list.m=n.getMonthList(l._start,l._end,e),this},reloadDaysList:function(){var e=t.getYear(d.selected.dt),r=t.getMonth(d.selected.dt);return d.list.d=i.getDaysList(l._start,l._end,e,r),this}};a.dt=e.isValidNumber(a.dt)?a.dt:null,o=e.isValidNumber(o)?o:null,u=e.isValidNumber(u)?u:null,d.selected=s(a,o,u);var y=t.getYear(d.selected.dt),g=t.getMonth(d.selected.dt);return l._limitDates=new LimitsModel(o,u),l._start=o,l._end=u,d.list.y=r.getYearsList(o,u,d.selected,l._limitDates),d.list.m=n.getMonthList(o,u,y,l._limitDates),d.list.d=i.getDaysList(o,u,y,g,d.selected,l._limitDates),d}}(DateUtils,CommonUtils,YearsUtils,MonthUtils,DaysUtils,DateModel);
-//# sourceMappingURL=x-date-core.min.js.map
+'use strict';
+
+var Config = {
+    isUtc: false,
+    monthDirection: 'asc',
+    daysDirection: 'asc',
+    yearsDirection: 'desc',
+    daysList: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    monthList: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+};
+var CommonUtils = (function () {
+    'use strict';
+
+    var exports = {
+        isValidNumber: function (num) {
+            var isNumber = !isNaN(num);
+            var isNotInfinity = isFinite(num);
+            return isNumber && isNotInfinity;
+        },
+        getArrayOfNumbers: function (start, end) {
+            var result = [];
+
+            for (var i = start; i <= end; i++) {
+                result.push(i);
+            }
+
+            return result;
+        },
+        intArraySort: function (arr, direction) {
+            function desc(a, b) {
+                return b - a;
+            }
+
+            switch (direction) {
+                default:
+                    return arr.sort(function (a, b) {
+                        return a - b;
+                    });
+                case "desc":
+                    return arr.sort(desc);
+            }
+        },
+        getIntArr: function (length) {
+            if (!length && length !== 0) return;
+            return length ? exports._getIntArr(length - 1).concat(length) : [];
+        }
+    };
+
+    return exports;
+})();
+var DateUtils = (function (Config) {
+    'use strict';
+
+    function getVal(dt, method) {
+        var date = new Date(dt);
+        return method.call(date);
+    }
+
+    var exports = {
+        getDay: function (dt) {
+            var method = (Config.isUTC) ? Date.prototype.getUTCDate : Date.prototype.getDate;
+            return getVal(dt, method);
+        },
+        getDayOfWeek: function (dt) {
+            var method = (Config.isUTC) ? Date.prototype.getUTCDay : Date.prototype.getDay;
+            return getVal(dt, method);
+        },
+        getYear: function (dt) {
+            var method = (Config.isUTC) ? Date.prototype.getUTCFullYear : Date.prototype.getFullYear;
+            return getVal(dt, method);
+        },
+        getMonth: function (dt) {
+            var method = (Config.isUTC) ? Date.prototype.getUTCMonth : Date.prototype.getMonth;
+            return getVal(dt, method);
+        },
+        getDaysInMonth: function (month, year) {
+            var method = (Config.isUTC) ? Date.prototype.getUTCDate : Date.prototype.getDate;
+            return method.call(new Date(year, month + 1, 0));
+        },
+        isValidModel: function (model) {
+            return !!model && (!!model.dt || model.dt === 0);
+        },
+        isDateUpperStartLimit: function (dt, start) {
+            if (!start) return true;
+            return (dt > start);
+        },
+        isDateLowerEndLimit: function (dt, end) {
+            if (!end) return true;
+            return (dt < end);
+        },
+        isDateBetweenLimits: function (dt, start, end) {
+            return (exports.isDateUpperStartLimit(dt, start) && exports.isDateLowerEndLimit(dt, end));
+        }
+    };
+
+    return exports;
+})(Config);
+var LimitsModel = (function (DateUtils) {
+    'use strict';
+
+    function LimitsModel(start, end) {
+
+        var exports = {
+            start: {},
+            end: {},
+            now: {}
+        };
+
+        function _setStart(dt) {
+            exports.start.d = DateUtils.getDay(dt);
+            exports.start.m = DateUtils.getMonth(dt);
+            exports.start.y = DateUtils.getYear(dt);
+            exports.start.dt = dt;
+            return this;//TODO (S.Panfilov) Possible strict violation
+        }
+
+        function _setEnd(dt) {
+            exports.end.d = DateUtils.getDay(dt);
+            exports.end.m = DateUtils.getMonth(dt);
+            exports.end.y = DateUtils.getYear(dt);
+            exports.end.dt = dt;
+            return this;//TODO (S.Panfilov) Possible strict violation
+        }
+
+        function _setNow() {
+            var dt = new Date().getTime();
+            exports.now.d = DateUtils.getDay(dt);
+            exports.now.m = DateUtils.getMonth(dt);
+            exports.now.y = DateUtils.getYear(dt);
+            exports.now.dt = dt;
+            return this;//TODO (S.Panfilov) Possible strict violation
+        }
+
+        _setStart(start);
+        _setEnd(end);
+        _setNow();
+        
+        return exports;
+    }
+    
+    return LimitsModel;
+})(DateUtils);
+var DateModel = (function (DateUtils) {
+    'use strict';
+
+    function DateModel(dt) {
+        this.d = DateUtils.getDay(dt);
+        this.dow = DateUtils.getDayOfWeek(dt);
+        this.m = DateUtils.getMonth(dt);
+        this.y = DateUtils.getYear(dt);
+        this.dt = dt;
+        this.tz = new Date(dt).getTimezoneOffset();
+
+        return this;
+    }
+
+    return DateModel;
+})(DateUtils);
+var YearsUtils = (function (DateUtils, CommonUtils, Config) {
+    'use strict';
+
+    var exports = {
+        getYearsList: function (startDt, endDt, model, limitsModel) {
+            var result = [];
+            var DEFAULT_YEARS_COUNT = 10;
+
+            var start = limitsModel.start.y;
+            var end = limitsModel.end.y;
+            var now = limitsModel.now.y;
+            var selectedYear = DateUtils.getYear(model.dt);
+            var latestPossibleYear = (selectedYear > now) ? selectedYear : now;
+            var firstPossibleYear = (selectedYear < now) ? selectedYear : now;
+            latestPossibleYear = latestPossibleYear + (DEFAULT_YEARS_COUNT - 1);
+            firstPossibleYear = firstPossibleYear - (DEFAULT_YEARS_COUNT - 1);
+
+            //start = 2011, end = 2014
+            if ((startDt && endDt) && (startDt < endDt)) {
+                result = CommonUtils.getArrayOfNumbers(start, end);
+            }
+
+            //start = 2014, end = 2011
+            else if ((startDt && endDt) && (startDt > endDt)) {
+                result = CommonUtils.getArrayOfNumbers(end, start);
+            }
+
+            //start = 2011, end = 2011
+            else if ((startDt && endDt) && (startDt === endDt)) {
+                result = CommonUtils.getArrayOfNumbers(start, end);
+            }
+
+            //start = 2014, end = null
+            else if (startDt && !endDt) {
+                result = CommonUtils.getArrayOfNumbers(start, latestPossibleYear);
+            }
+
+            //start = null, end = 2014
+            else if (!startDt && endDt) {
+                //now = 2013 (or 2014),  end = 2014
+                if (limitsModel.end.y >= limitsModel.now.y) {
+
+                    if ((firstPossibleYear - DEFAULT_YEARS_COUNT) > (end - DEFAULT_YEARS_COUNT)) {
+                        result = CommonUtils.getArrayOfNumbers(firstPossibleYear, end);
+                    } else {
+                        result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
+                    }
+
+                }
+                //now = 2015,  end = 2014
+                else if (limitsModel.end.y > limitsModel.now.y) {
+                    result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
+                }
+
+            }
+
+            //start = null, end = null
+            else if (!startDt && !endDt) {
+                result = CommonUtils.getArrayOfNumbers(firstPossibleYear, latestPossibleYear);
+            }
+
+            return CommonUtils.intArraySort(result, Config.yearsListDirection);
+        }
+    };
+
+    return exports;
+})(DateUtils, CommonUtils, Config);
+var MonthUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+    'use strict';
+
+    var exports = {
+        getMonthList: function (startDt, endDt, selectedYear) {
+            var result;
+            var START_MONTH = 0;
+            var END_MONTH = 11;
+
+            //TODO (S.Panfilov)  check
+            if (startDt || endDt) {
+                var isYearOfLowerLimit = (startDt) ? LimitsModel.start.y === selectedYear : false;
+                var isYearOfUpperLimit = (endDt) ? LimitsModel.end.y === selectedYear : false;
+                var start = (startDt) ? LimitsModel.start.m : START_MONTH;
+                var end = (endDt) ? LimitsModel.end.m : END_MONTH;
+
+                // startYear == 2015, nowYear == 2015, endYear == 2015
+                if (isYearOfLowerLimit && isYearOfUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(start, end);
+                }
+                // startYear == 2015, nowYear == 2015, endYear == 2016 (or null)
+                else if (isYearOfLowerLimit && !isYearOfUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(start, END_MONTH);
+                }
+                // startYear == 2014 (or null), nowYear == 2015, endYear == 2015
+                else if (!isYearOfLowerLimit && isYearOfUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(START_MONTH, end);
+                }
+                else {
+                    // in all other cases return array of 12 month
+                    result = CommonUtils.getArrayOfNumbers(START_MONTH, END_MONTH);
+                }
+            } else {
+                // in all other cases return array of 12 month
+                result = CommonUtils.getArrayOfNumbers(START_MONTH, END_MONTH);
+            }
+
+            return CommonUtils.intArraySort(result, Config.monthListDirection);
+        }
+    };
+
+    return exports;
+})(LimitsModel, DateUtils, CommonUtils, Config);
+var DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+    'use strict';
+
+    var exports = {
+        getDaysList: function (startDt, endDt, year, month) {
+            var result;
+            var START_DAY = 1;
+            var lastDayInMonth = DateUtils.getDaysInMonth(month, year);
+
+            //TODO (S.Panfilov)  check
+            if (startDt || endDt) {
+                var isYearOfLowerLimit = (startDt) ? LimitsModel.start.y === year : false;
+                var isYearOfUpperLimit = (endDt) ? LimitsModel.end.y === year : false;
+                var isMonthOfLowerLimit = (startDt) ? LimitsModel.start.m === month : false;
+                var isMonthOfUpperLimit = (endDt) ? LimitsModel.end.m === month : false;
+
+                var isLowerLimit = (isYearOfLowerLimit && isMonthOfLowerLimit);
+                var isUpperLimit = (isYearOfUpperLimit && isMonthOfUpperLimit);
+
+                var start = (startDt) ? LimitsModel.start.d : START_DAY;
+                var end = (endDt) ? LimitsModel.end.d : lastDayInMonth;
+
+                if (isLowerLimit && isUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(start, end);
+                } else if (isLowerLimit && !isUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(start, lastDayInMonth);
+                } else if (!isLowerLimit && isUpperLimit) {
+                    result = CommonUtils.getArrayOfNumbers(START_DAY, end);
+                } else {
+                    // in all other cases return array of 12 month
+                    result = CommonUtils.getArrayOfNumbers(START_DAY, lastDayInMonth);
+                }
+            } else {
+                // in all other cases return array of 12 month
+                result = CommonUtils.getArrayOfNumbers(START_DAY, lastDayInMonth);
+            }
+
+            return CommonUtils.intArraySort(result, Config.daysListDirection);
+        }
+    };
+
+    return exports;
+})(LimitsModel, DateUtils, CommonUtils, Config);
+var DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel) {
+    'use strict';
+
+    function _getSelected(model, start, end) {
+        var result;
+
+        var isUpperStart = (model.dt > start);
+        var isEqualStart = (model.dt === start);
+        var isLowerEnd = (model.dt > end);
+        var isEqualEnd = (model.dt === end);
+
+        //start == 1; model == 1 or 2 or 3; end == 3;
+        if ((isUpperStart || isEqualStart) || (isLowerEnd || isEqualEnd)) {
+            result = new DateModel(model.dt);
+        } else
+        //start == 1; model == 0
+        if (!isUpperStart) {
+            result = new DateModel(start);
+        } else
+        //model == 4; end == 3;
+        if (!isUpperStart) {
+            result = new DateModel(end);
+        }
+        //paranoid case
+        else {
+            result = new DateModel(new Date().getTime());
+        }
+
+        return result;
+    }
+
+    return function (model, start, end) {
+
+        var _private = {
+            _start: null,
+            _end: null,
+            _limitDates: null
+        };
+
+        var exports = {
+            selected: {},
+            list: {
+                y: null,
+                m: null,
+                d: null
+            },
+            reloadYearsList: function () {
+                exports.list.y = YearsUtils.getYearsList(_private._start, _private._end);
+                return this;
+            },
+            reloadMonthList: function () {
+                var selectedYear = DateUtils.getYear(exports.selected.dt);
+                exports.list.m = MonthUtils.getMonthList(_private._start, _private._end, selectedYear);
+                return this;
+            },
+            reloadDaysList: function () {
+                var selectedYear = DateUtils.getYear(exports.selected.dt);
+                var selectedMonth = DateUtils.getMonth(exports.selected.dt);
+                exports.list.d = DaysUtils.getDaysList(_private._start, _private._end, selectedYear, selectedMonth);
+                return this;
+            }
+        };
+
+        model.dt = CommonUtils.isValidNumber(model.dt) ? model.dt : null;
+        start = CommonUtils.isValidNumber(start) ? start : null;
+        end = CommonUtils.isValidNumber(end) ? end : null;
+
+        exports.selected = _getSelected(model, start, end);
+        var selectedYear = DateUtils.getYear(exports.selected.dt);
+        var selectedMonth = DateUtils.getMonth(exports.selected.dt);
+
+        _private._limitDates = new LimitsModel(start, end);
+        _private._start = start;
+        _private._end = end;
+
+        exports.list.y = YearsUtils.getYearsList(start, end, exports.selected, _private._limitDates);
+        exports.list.m = MonthUtils.getMonthList(start, end, selectedYear, _private._limitDates);
+        exports.list.d = DaysUtils.getDaysList(start, end, selectedYear, selectedMonth, exports.selected, _private._limitDates);
+
+        return exports;
+    };
+
+})(DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel);
 var angularView = (function (DateUtils, DataClass, Config) {
     'use strict';
 

@@ -8,7 +8,7 @@ var src = {
     styles: 'src/templates/**/*.styl',
     jade: 'src/templates/**/*.jade',
     js: 'src/*.js',
-    coreJs: 'bower_components/x-date-core/dist/x-date-core.min.js'
+    coreJs: 'bower_components/x-date-core/dist/x-date-core.js'
 };
 
 var dest = {
@@ -74,18 +74,35 @@ function makeJade() {
         }))
 }
 
-function makeJS() {
+
+function makeCoreJS() {
+    return gulp.src(src.coreJs)
+}
+
+function makeViewJS() {
     ngAnnotate = ngAnnotate || require('gulp-ng-annotate');
+    concat = concat || require('gulp-concat');
+
+    return gulp.src(src.js)
+        .pipe(concat('view.js'))
+        .pipe(ngAnnotate({remove: true, add: true, single_quotes: true}))
+}
+
+function makeJS() {
+    mergeStream = mergeStream || require('merge-stream');
     concat = concat || require('gulp-concat');
     order = order || require('gulp-order');
 
-    return gulp.src([src.js, src.coreJs])
+    var coreJs = makeCoreJS();
+    var viewJs = makeViewJS();
+
+    return mergeStream(coreJs, viewJs)
         .pipe(order([
-            'x-date-core.min.js',
-            src.js
+            'x-date-core.js',
+            'view.js'
         ]))
         .pipe(concat('view-and-core.js'))
-        .pipe(ngAnnotate({remove: true, add: true, single_quotes: true}));
+        ;
         //.pipe(gulp.dest(dest.dist));
 }
 
