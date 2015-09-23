@@ -32,7 +32,7 @@ angular.module('demo', [
                 console.dir(scope.caseModel);
 
                 scope.plusOneMonth = function () {
-                    var date = new Date(scope.caseModel.model.datetime);
+                    var date = new Date(scope.caseModel.model.dt);
                     if (date.getMonth() === 11) {
                         date.setMonth(0);
                         date.setFullYear(date.getFullYear() + 1)
@@ -40,11 +40,11 @@ angular.module('demo', [
                         date.setMonth(date.getMonth() + 1);
                     }
 
-                    scope.caseModel.model.datetime = date.getTime();
+                    scope.caseModel.model.dt = date.getTime();
                 };
 
                 scope.minusOneMonth = function () {
-                    var date = new Date(scope.caseModel.model.datetime);
+                    var date = new Date(scope.caseModel.model.dt);
                     if (date.getMonth() === 0) {
                         date.setMonth(11);
                         date.setFullYear(date.getFullYear() - 1)
@@ -52,7 +52,7 @@ angular.module('demo', [
                         date.setMonth(date.getMonth() - 1);
                     }
 
-                    scope.caseModel.model.datetime = date.getTime();
+                    scope.caseModel.model.dt = date.getTime();
                 };
             }
         };
@@ -64,13 +64,13 @@ angular.module('demo', [
 
         $scope.commonCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             }
         };
 
         $scope.limitsCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2015, 6, 21).getTime(),
             endDate: new Date(2020, 6, 27).getTime()
@@ -78,28 +78,28 @@ angular.module('demo', [
 
         $scope.leftLimitsCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2012, 4, 3).getTime()
         };
 
         $scope.rightLimitsCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             endDate: new Date(2015, 7, 31).getTime()
         };
 
         $scope.outOfRightLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             endDate: new Date(2015, 6, 21).getTime()
         };
 
         $scope.outOfLeftLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2015, 6, 27).getTime()
         };
@@ -120,27 +120,27 @@ angular.module('demo', [
 
         $scope.invalidLeftLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: 'invalid'
         };
 
         $scope.invalidRightLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             endDate: Infinity
         };
 
         $scope.linkedModelCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             }
         };
 
         $scope.linkedModelBothLimitsCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2015, 6, 25).getTime(),
             endDate: new Date(2015, 6, 27).getTime()
@@ -148,7 +148,7 @@ angular.module('demo', [
 
         $scope.linkedModelBothDifferentLimitsCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate_one: new Date(2015, 5, 1).getTime(),
             endDate_one: new Date(2015, 7, 31).getTime(),
@@ -158,27 +158,27 @@ angular.module('demo', [
 
         $scope.externalChangeCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             }
         };
 
         $scope.externalChangeLeftLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2013, 6, 25).getTime()
         };
 
         $scope.externalChangeRightLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             endDate: new Date(2018, 6, 27).getTime()
         };
 
         $scope.externalChangeBothLimitCase = {
             model: {
-                datetime: new Date(2015, 6, 26).getTime()
+                dt: new Date(2015, 6, 26).getTime()
             },
             startDate: new Date(2013, 6, 25).getTime(),
             endDate: new Date(2018, 6, 27).getTime()
