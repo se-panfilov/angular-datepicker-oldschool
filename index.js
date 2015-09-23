@@ -29,8 +29,6 @@ angular.module('demo', [
                     return $filter('date')(new Date(datetime), 'dd-MM-yyyy');
                 };
 
-                console.dir(scope.caseModel);
-
                 scope.plusOneMonth = function () {
                     var date = new Date(scope.caseModel.model.dt);
                     if (date.getMonth() === 11) {
