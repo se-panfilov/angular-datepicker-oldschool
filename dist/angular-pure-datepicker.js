@@ -1,6 +1,6 @@
 var xDateCore = (function () {
     var exports = {};
-    exports.Config = (function () {
+exports.Config = (function () {
     'use strict';
 
     return {
@@ -13,11 +13,6 @@ var xDateCore = (function () {
         monthList: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     };
 })();
-
-////TODO (S.Panfilov) test
-//if ( typeof module === 'object' && module.exports) {
-//    module.exports = Config;
-//}
 exports.CommonUtils = (function () {
     'use strict';
 
@@ -171,134 +166,101 @@ exports.DateModel = (function (DateUtils) {
 exports.YearsUtils = (function (DateUtils, CommonUtils, Config) {
     'use strict';
 
-    var exports = {
+    return {
         getYearsList: function (startDt, endDt, model, limitsModel) {
             var result = [];
             var DEFAULT_YEARS_COUNT = Config.defaultYearsCount;
 
-            var start = limitsModel.start.y;
-            var end = limitsModel.end.y;
-            var now = limitsModel.now.y;
+            var start = (limitsModel) ? limitsModel.start.y : null;
+            var end = (limitsModel) ? limitsModel.end.y : null;
+            var now = (limitsModel) ? limitsModel.now.y : null;
             var selectedYear = DateUtils.getYear(model.dt);
             var latestPossibleYear = (selectedYear > now) ? selectedYear : now;
             var firstPossibleYear = (selectedYear < now) ? selectedYear : now;
             latestPossibleYear += (DEFAULT_YEARS_COUNT - 1);
             firstPossibleYear -= (DEFAULT_YEARS_COUNT - 1);
 
-            //start = 2011, end = 2014
-            if ((startDt && endDt) && (startDt < endDt)) {
+            //TODO (S.Panfilov) why we use here limitModel's start but not startDt?
+            //TODO (S.Panfilov) Cur work point
+            if ((startDt && endDt) && (startDt < endDt)) { //start = 2011, end = 2014
                 result = CommonUtils.getArrayOfNumbers(start, end);
-            }
-
-            //start = 2014, end = 2011
-            else if ((startDt && endDt) && (startDt > endDt)) {
+            } else if ((startDt && endDt) && (startDt > endDt)) { //start = 2014, end = 2011
                 result = CommonUtils.getArrayOfNumbers(end, start);
-            }
-
-            //start = 2011, end = 2011
-            else if ((startDt && endDt) && (startDt === endDt)) {
+            } else if ((startDt && endDt) && (startDt === endDt)) { //start = 2011, end = 2011
                 result = CommonUtils.getArrayOfNumbers(start, end);
-            }
-
-            //start = 2014, end = null
-            else if (startDt && !endDt) {
+            } else if (startDt && !endDt) {  //start = 2014, end = null
                 result = CommonUtils.getArrayOfNumbers(start, latestPossibleYear);
-            }
-
-            //start = null, end = 2014
-            else if (!startDt && endDt) {
-                //now = 2013 (or 2014),  end = 2014
-                if (limitsModel.end.y >= limitsModel.now.y) {
-
+            } else if (!startDt && endDt) {  //start = null, end = 2014
+                if (limitsModel.end.y >= limitsModel.now.y) {  //now = 2013 (or 2014),  end = 2014
                     if ((firstPossibleYear - DEFAULT_YEARS_COUNT) > (end - DEFAULT_YEARS_COUNT)) {
                         result = CommonUtils.getArrayOfNumbers(firstPossibleYear, end);
                     } else {
                         result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
                     }
-
-                }
-                //now = 2015,  end = 2014
-                else if (limitsModel.end.y > limitsModel.now.y) {
+                } else if (limitsModel.end.y > limitsModel.now.y) {  //now = 2015,  end = 2014
                     result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
                 }
-
-            }
-
-            //start = null, end = null
-            else if (!startDt && !endDt) {
+            } else if (!startDt && !endDt) {  //start = null, end = null
                 result = CommonUtils.getArrayOfNumbers(firstPossibleYear, latestPossibleYear);
             }
 
             return CommonUtils.intArraySort(result, Config.yearsDirection);
         }
     };
-
-    return exports;
 })(exports.DateUtils, exports.CommonUtils, exports.Config);
-exports.MonthUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+exports.MonthUtils = (function (DateUtils, CommonUtils, Config) {
     'use strict';
 
-    var exports = {
-        getMonthList: function (startDt, endDt, selectedYear) {
+    return {
+        getMonthList: function (startDt, endDt, selectedYear, limitsModel) {
             var result;
             var START_MONTH = 0;
             var END_MONTH = 11;
 
-            //TODO (S.Panfilov)  check
             if (startDt || endDt) {
-                var isYearOfLowerLimit = (startDt) ? LimitsModel.start.y === selectedYear : false;
-                var isYearOfUpperLimit = (endDt) ? LimitsModel.end.y === selectedYear : false;
-                var start = (startDt) ? LimitsModel.start.m : START_MONTH;
-                var end = (endDt) ? LimitsModel.end.m : END_MONTH;
+                var isYearOfLowerLimit = (startDt) ? limitsModel.start.y === selectedYear : false;
+                var isYearOfUpperLimit = (endDt) ? limitsModel.end.y === selectedYear : false;
+                var start = (startDt) ? limitsModel.start.m : START_MONTH;
+                var end = (endDt) ? limitsModel.end.m : END_MONTH;
 
                 // startYear == 2015, nowYear == 2015, endYear == 2015
                 if (isYearOfLowerLimit && isYearOfUpperLimit) {
                     result = CommonUtils.getArrayOfNumbers(start, end);
-                }
-                // startYear == 2015, nowYear == 2015, endYear == 2016 (or null)
-                else if (isYearOfLowerLimit && !isYearOfUpperLimit) {
+                } else if (isYearOfLowerLimit && !isYearOfUpperLimit) {  // startYear == 2015, nowYear == 2015, endYear == 2016 (or null)
                     result = CommonUtils.getArrayOfNumbers(start, END_MONTH);
-                }
-                // startYear == 2014 (or null), nowYear == 2015, endYear == 2015
-                else if (!isYearOfLowerLimit && isYearOfUpperLimit) {
+                } else if (!isYearOfLowerLimit && isYearOfUpperLimit) {  // startYear == 2014 (or null), nowYear == 2015, endYear == 2015
                     result = CommonUtils.getArrayOfNumbers(START_MONTH, end);
-                }
-                else {
-                    // in all other cases return array of 12 month
+                } else {  // in all other cases return array of 12 month
                     result = CommonUtils.getArrayOfNumbers(START_MONTH, END_MONTH);
                 }
-            } else {
-                // in all other cases return array of 12 month
+            } else {  // in all other cases return array of 12 month
                 result = CommonUtils.getArrayOfNumbers(START_MONTH, END_MONTH);
             }
 
             return CommonUtils.intArraySort(result, Config.monthDirection);
         }
     };
-
-    return exports;
-})(exports.LimitsModel, exports.DateUtils, exports.CommonUtils, exports.Config);
-exports.DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+})(exports.DateUtils, exports.CommonUtils, exports.Config);
+exports.DaysUtils = (function (DateUtils, CommonUtils, Config) {
     'use strict';
 
-    var exports = {
-        getDaysList: function (startDt, endDt, year, month) {
+    return {
+        getDaysList: function (startDt, endDt, year, month, limitsModel) {
             var result;
             var START_DAY = 1;
             var lastDayInMonth = DateUtils.getDaysInMonth(month, year);
 
-            //TODO (S.Panfilov)  check
             if (startDt || endDt) {
-                var isYearOfLowerLimit = (startDt) ? LimitsModel.start.y === year : false;
-                var isYearOfUpperLimit = (endDt) ? LimitsModel.end.y === year : false;
-                var isMonthOfLowerLimit = (startDt) ? LimitsModel.start.m === month : false;
-                var isMonthOfUpperLimit = (endDt) ? LimitsModel.end.m === month : false;
+                var isYearOfLowerLimit = (startDt) ? limitsModel.start.y === year : false;
+                var isYearOfUpperLimit = (endDt) ? limitsModel.end.y === year : false;
+                var isMonthOfLowerLimit = (startDt) ? limitsModel.start.m === month : false;
+                var isMonthOfUpperLimit = (endDt) ? limitsModel.end.m === month : false;
 
                 var isLowerLimit = (isYearOfLowerLimit && isMonthOfLowerLimit);
                 var isUpperLimit = (isYearOfUpperLimit && isMonthOfUpperLimit);
 
-                var start = (startDt) ? LimitsModel.start.d : START_DAY;
-                var end = (endDt) ? LimitsModel.end.d : lastDayInMonth;
+                var start = (startDt) ? limitsModel.start.d : START_DAY;
+                var end = (endDt) ? limitsModel.end.d : lastDayInMonth;
 
                 if (isLowerLimit && isUpperLimit) {
                     result = CommonUtils.getArrayOfNumbers(start, end);
@@ -306,22 +268,18 @@ exports.DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
                     result = CommonUtils.getArrayOfNumbers(start, lastDayInMonth);
                 } else if (!isLowerLimit && isUpperLimit) {
                     result = CommonUtils.getArrayOfNumbers(START_DAY, end);
-                } else {
-                    // in all other cases return array of 12 month
+                } else {  // in all other cases return array of 12 month
                     result = CommonUtils.getArrayOfNumbers(START_DAY, lastDayInMonth);
                 }
-            } else {
-                // in all other cases return array of 12 month
+            } else {  // in all other cases return array of 12 month
                 result = CommonUtils.getArrayOfNumbers(START_DAY, lastDayInMonth);
             }
 
             return CommonUtils.intArraySort(result, Config.daysDirection);
         }
     };
-
-    return exports;
-})(exports.LimitsModel, exports.DateUtils, exports.CommonUtils, exports.Config);
-exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel) {
+})(exports.DateUtils, exports.CommonUtils, exports.Config);
+exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel, LimitsModel) {
     'use strict';
 
     function _getSelected(model, start, end) {
@@ -397,13 +355,11 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
         return exports;
     };
 
-})(exports.DateUtils, exports.CommonUtils, exports.YearsUtils, exports.MonthUtils, exports.DaysUtils, exports.DateModel);
-    if (typeof module === 'object' && module.exports) {
-        module.exports = exports;
-    }
+})(exports.DateUtils, exports.CommonUtils, exports.YearsUtils, exports.MonthUtils, exports.DaysUtils, exports.DateModel, exports.LimitsModel);
+    if (typeof module === 'object' && module.exports) module.exports = exports;
 
     return exports;})();
-var angularView = (function (DateUtils, DataClass, Config) {
+var angularView = (function (DateUtils, DataClass, Config, DateModel) {
     'use strict';
 
 
@@ -572,5 +528,5 @@ var angularView = (function (DateUtils, DataClass, Config) {
                 }
             }
         });
-})(DateUtils, DataClass, Config);
+})(xDateCore.DateUtils, xDateCore.DataClass, xDateCore.Config, xDateCore.DateModel);
 angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=data.selected.d ng-options=\"day for day in data.list.d\" ng-init=\"data.selected.d = data.list.d[0]\" ng-change=onDaySelectChanged(data.selected.d) id={{::apdDayId}} class=\"apd_elem apd_select_day apd_select {{::apdDayClasses}}\"></select><span ng-bind=daysList[data.selected.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=data.selected.m ng-options=\"monthList[month] for month in data.list.m\" ng-init=\"data.selected.m = data.list.m[0]\" ng-change=onMonthSelectChanged(data.selected.m) id={{::apdMonthId}} class=\"apd_elem apd_select_month apd_select {{::apdMonthClasses}}\"></select><select ng-model=data.selected.y ng-options=\"year for year in data.list.y\" ng-init=\"data.selected.y = data.list.y[0]\" ng-change=onYearSelectChanged(data.selected.y) id={{::apdYearId}} class=\"apd_elem apd_select_year apd_select {{::apdYearClasses}}\"></select></div>");}]);
