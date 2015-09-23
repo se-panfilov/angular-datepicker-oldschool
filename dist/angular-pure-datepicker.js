@@ -1,32 +1,24 @@
-'use strict';
+var xDateCore = (function () {
+    var exports = {};
+    exports.Config = (function () {
+    'use strict';
 
-var Config = {
-    isUtc: false,
-    monthDirection: 'asc',
-    daysDirection: 'asc',
-    yearsDirection: 'desc',
-    defaultYearsCount: 50,
-    daysList: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    monthList: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-};
+    return {
+        isUtc: false,
+        monthDirection: 'asc',
+        daysDirection: 'asc',
+        yearsDirection: 'desc',
+        defaultYearsCount: 50,
+        daysList: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        monthList: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    };
+})();
 
-//
-//var Config = (function () {
-//    return {
-//        isUtc: false,
-//        monthDirection: 'asc',
-//        daysDirection: 'asc',
-//        yearsDirection: 'desc',
-//        daysList: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-//        monthList: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-//    };
-//})();
-//
 ////TODO (S.Panfilov) test
 //if ( typeof module === 'object' && module.exports) {
 //    module.exports = Config;
 //}
-var CommonUtils = (function () {
+exports.CommonUtils = (function () {
     'use strict';
 
     var exports = {
@@ -45,6 +37,8 @@ var CommonUtils = (function () {
             return result;
         },
         intArraySort: function (arr, direction) {
+            var DESC = 'desc';
+
             function desc(a, b) {
                 return b - a;
             }
@@ -54,19 +48,19 @@ var CommonUtils = (function () {
                     return arr.sort(function (a, b) {
                         return a - b;
                     });
-                case "desc":
+                case DESC:
                     return arr.sort(desc);
             }
         },
         getIntArr: function (length) {
             if (!length && length !== 0) return;
-            return length ? exports._getIntArr(length - 1).concat(length) : [];
+            return length ? exports.getIntArr(length - 1).concat(length) : [];
         }
     };
 
     return exports;
 })();
-var DateUtils = (function (Config) {
+exports.DateUtils = (function (Config) {
     'use strict';
 
     function getVal(dt, method) {
@@ -76,23 +70,23 @@ var DateUtils = (function (Config) {
 
     var exports = {
         getDay: function (dt) {
-            var method = (Config.isUTC) ? Date.prototype.getUTCDate : Date.prototype.getDate;
+            var method = (Config.isUtc) ? Date.prototype.getUTCDate : Date.prototype.getDate;
             return getVal(dt, method);
         },
         getDayOfWeek: function (dt) {
-            var method = (Config.isUTC) ? Date.prototype.getUTCDay : Date.prototype.getDay;
+            var method = (Config.isUtc) ? Date.prototype.getUTCDay : Date.prototype.getDay;
             return getVal(dt, method);
         },
         getYear: function (dt) {
-            var method = (Config.isUTC) ? Date.prototype.getUTCFullYear : Date.prototype.getFullYear;
+            var method = (Config.isUtc) ? Date.prototype.getUTCFullYear : Date.prototype.getFullYear;
             return getVal(dt, method);
         },
         getMonth: function (dt) {
-            var method = (Config.isUTC) ? Date.prototype.getUTCMonth : Date.prototype.getMonth;
+            var method = (Config.isUtc) ? Date.prototype.getUTCMonth : Date.prototype.getMonth;
             return getVal(dt, method);
         },
         getDaysInMonth: function (month, year) {
-            var method = (Config.isUTC) ? Date.prototype.getUTCDate : Date.prototype.getDate;
+            var method = (Config.isUtc) ? Date.prototype.getUTCDate : Date.prototype.getDate;
             return method.call(new Date(year, month + 1, 0));
         },
         isValidModel: function (model) {
@@ -112,8 +106,8 @@ var DateUtils = (function (Config) {
     };
 
     return exports;
-})(Config);
-var LimitsModel = (function (DateUtils) {
+})(exports.Config);
+exports.LimitsModel = (function (DateUtils) {
     'use strict';
 
     function LimitsModel(start, end) {
@@ -157,8 +151,8 @@ var LimitsModel = (function (DateUtils) {
     }
     
     return LimitsModel;
-})(DateUtils);
-var DateModel = (function (DateUtils) {
+})(exports.DateUtils);
+exports.DateModel = (function (DateUtils) {
     'use strict';
 
     function DateModel(dt) {
@@ -173,8 +167,8 @@ var DateModel = (function (DateUtils) {
     }
 
     return DateModel;
-})(DateUtils);
-var YearsUtils = (function (DateUtils, CommonUtils, Config) {
+})(exports.DateUtils);
+exports.YearsUtils = (function (DateUtils, CommonUtils, Config) {
     'use strict';
 
     var exports = {
@@ -188,8 +182,8 @@ var YearsUtils = (function (DateUtils, CommonUtils, Config) {
             var selectedYear = DateUtils.getYear(model.dt);
             var latestPossibleYear = (selectedYear > now) ? selectedYear : now;
             var firstPossibleYear = (selectedYear < now) ? selectedYear : now;
-            latestPossibleYear = latestPossibleYear + (DEFAULT_YEARS_COUNT - 1);
-            firstPossibleYear = firstPossibleYear - (DEFAULT_YEARS_COUNT - 1);
+            latestPossibleYear += (DEFAULT_YEARS_COUNT - 1);
+            firstPossibleYear -= (DEFAULT_YEARS_COUNT - 1);
 
             //start = 2011, end = 2014
             if ((startDt && endDt) && (startDt < endDt)) {
@@ -240,8 +234,8 @@ var YearsUtils = (function (DateUtils, CommonUtils, Config) {
     };
 
     return exports;
-})(DateUtils, CommonUtils, Config);
-var MonthUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+})(exports.DateUtils, exports.CommonUtils, exports.Config);
+exports.MonthUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
     'use strict';
 
     var exports = {
@@ -278,13 +272,13 @@ var MonthUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
                 result = CommonUtils.getArrayOfNumbers(START_MONTH, END_MONTH);
             }
 
-            return CommonUtils.intArraySort(result, Config.monthListDirection);
+            return CommonUtils.intArraySort(result, Config.monthDirection);
         }
     };
 
     return exports;
-})(LimitsModel, DateUtils, CommonUtils, Config);
-var DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
+})(exports.LimitsModel, exports.DateUtils, exports.CommonUtils, exports.Config);
+exports.DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
     'use strict';
 
     var exports = {
@@ -321,13 +315,13 @@ var DaysUtils = (function (LimitsModel, DateUtils, CommonUtils, Config) {
                 result = CommonUtils.getArrayOfNumbers(START_DAY, lastDayInMonth);
             }
 
-            return CommonUtils.intArraySort(result, Config.daysListDirection);
+            return CommonUtils.intArraySort(result, Config.daysDirection);
         }
     };
 
     return exports;
-})(LimitsModel, DateUtils, CommonUtils, Config);
-var DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel) {
+})(exports.LimitsModel, exports.DateUtils, exports.CommonUtils, exports.Config);
+exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel) {
     'use strict';
 
     function _getSelected(model, start, end) {
@@ -341,17 +335,11 @@ var DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysU
         //start == 1; model == 1 or 2 or 3; end == 3;
         if ((isUpperStart || isEqualStart) || (isLowerEnd || isEqualEnd)) {
             result = new DateModel(model.dt);
-        } else
-        //start == 1; model == 0
-        if (!isUpperStart) {
+        } else if (!isUpperStart) { //start == 1; model == 0
             result = new DateModel(start);
-        } else
-        //model == 4; end == 3;
-        if (!isUpperStart) {
+        } else if (!isUpperStart) { //model == 4; end == 3;
             result = new DateModel(end);
-        }
-        //paranoid case
-        else {
+        } else {//paranoid case
             result = new DateModel(new Date().getTime());
         }
 
@@ -409,7 +397,12 @@ var DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysU
         return exports;
     };
 
-})(DateUtils, CommonUtils, YearsUtils, MonthUtils, DaysUtils, DateModel);
+})(exports.DateUtils, exports.CommonUtils, exports.YearsUtils, exports.MonthUtils, exports.DaysUtils, exports.DateModel);
+    if (typeof module === 'object' && module.exports) {
+        module.exports = exports;
+    }
+
+    return exports;})();
 var angularView = (function (DateUtils, DataClass, Config) {
     'use strict';
 
