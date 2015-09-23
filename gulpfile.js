@@ -24,8 +24,9 @@ gulp.task('build', function () {
 
 gulp.task('webserver', function () {
     connect = connect || require('gulp-connect');
+    console.log(__dirname);
     connect.server({
-        root: [__dirname, '../dist', 'dist'],
+        root: [__dirname, '../../angular-datepicker-oldschool/dist'],
         port: 8001,
         livereload: true
     });
