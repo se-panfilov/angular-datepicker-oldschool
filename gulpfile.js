@@ -1,12 +1,13 @@
-var gulp = require('gulp'), jade, watch, connect, minifyHTML;
+"use strict";
+
+const gulp = require('gulp');
+const jade = require('gulp-jade');
+const minifyHTML = require('gulp-minify-html');
+const webServer = require('gulp-webserver');
 
 gulp.task('jade', function () {
-    jade = jade || require('gulp-jade');
-    minifyHTML = minifyHTML || require('gulp-minify-html');
-
     return gulp.src('./*.jade')
         .pipe(jade({pretty: false}))
-        .on('error', console.log)
         .pipe(minifyHTML({
             empty: true,
             spare: true
@@ -23,13 +24,22 @@ gulp.task('build', function () {
 });
 
 gulp.task('webserver', function () {
-    connect = connect || require('gulp-connect');
-    console.log(__dirname);
-    connect.server({
-        root: [__dirname, '../../angular-datepicker-oldschool/dist'],
-        port: 8001,
-        livereload: true
-    });
+
+    gulp.src([__dirname, '../angular-datepicker-oldschool/dist'])
+        .pipe(webServer({
+            fallback: 'index.html',
+            port: 8001,
+            livereload: true,
+            //directoryListing: true,
+            //proxies: [{
+            //    source: '/register',
+            //    target: 'http://localhost:8080/1337'
+            //}],
+            open: true
+            //middleware: function () {
+            //    return [cors];
+            //}
+        }));
 });
 
 gulp.task('default', function () {
