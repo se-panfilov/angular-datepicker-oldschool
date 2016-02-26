@@ -16,7 +16,7 @@
   },
 
   "dependencies": {
-    "x-date-core": "git@github.com:se-panfilov/x-date-core.git"
+    "x-date-core": "https://github.com/se-panfilov/x-date-core.git"
   },
   "keywords": [
     "datepicker",

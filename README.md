@@ -37,7 +37,7 @@ Installation and usage
 
     or download from git: [releases][2]
     
- 2. Add to `index.html`
+ 2. Add to html
  
     ```html
     <link href="bower_components/angular-pure-datepicker/dist/angular-pure-datepicker.css">
