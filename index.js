@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('demo', [
-    'angular-pd'
-])
+        'angular-pd'
+    ])
 
     .directive('modelWell', function ($filter) {
         return {
@@ -58,7 +58,10 @@ angular.module('demo', [
 
     .controller('DemoPageCtrl', function ($scope) {
 
-        $scope.localizedDays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+        $scope.localized = {
+            daysList: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            monthList: ['Январт', 'Фераль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+        };
 
         $scope.commonCase = {
             model: {
