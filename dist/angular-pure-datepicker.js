@@ -574,10 +574,8 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                         settings.initDateModel = getInitDateModel(scope.ngModel);
                         _initData(settings.initDateModel, settings.startDateTime, settings.endDateTime);
 
-                        //TODO (S.Panfilov) localization fix
-                        var localization = scope.apdLocalization || null;
-                        scope.daysList = Config.daysList;
-                        scope.monthList = Config.monthList;
+                        scope.daysList = (scope.apdLocalization.daysList) ? scope.apdLocalization.daysList :  Config.daysList;
+                        scope.monthList = (scope.apdLocalization.monthList) ? scope.apdLocalization.monthList :  Config.monthList;
 
                         ngModelWatcher.start(onModelChange);
                     })();
