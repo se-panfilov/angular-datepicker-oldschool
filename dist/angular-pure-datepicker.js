@@ -18,18 +18,22 @@ exports.CommonUtils = (function () {
 
     var exports = {
         isValidNumber: function (num) {
-            var isNumber = !isNaN(num);
+            var isNumber = !isNaN(parseFloat(num));
             var isNotInfinity = isFinite(num);
             return isNumber && isNotInfinity;
         },
         getArrayOfNumbers: function (start, end) {
-            var result = [];
+            if (!exports.isValidNumber(start) || !exports.isValidNumber(end)) return [];
 
-            for (var i = start; i <= end; i++) {
-                result.push(i);
-            }
+            var isReverse = (start > end);
+            var targetLength = isReverse ? (start - end) + 1 : (end - start ) + 1;
+            var arr = new Array(targetLength);
+            var newArr = Array.apply(null, arr);
+            var result = newArr.map(function (d, n) {
+                return (isReverse) ? n + end : n + start;
+            });
 
-            return result;
+            return (isReverse) ? result.reverse() : result;
         },
         intArraySort: function (arr, direction) {
             var DESC = 'desc';
@@ -46,10 +50,6 @@ exports.CommonUtils = (function () {
                 case DESC:
                     return arr.sort(desc);
             }
-        },
-        getIntArr: function (length) {
-            if (!length && length !== 0) return;
-            return length ? exports.getIntArr(length - 1).concat(length) : [];
         }
     };
 
@@ -59,8 +59,8 @@ exports.DateUtils = (function (Config) {
     'use strict';
 
     function getVal(dt, method) {
-        var date = new Date(dt);
-        return method.call(date);
+        var date = new Date(+dt);
+        return (date && method) ? method.call(date) : null;
     }
 
     var exports = {
@@ -82,23 +82,31 @@ exports.DateUtils = (function (Config) {
         },
         getDaysInMonth: function (month, year) {
             var method = (Config.isUtc) ? Date.prototype.getUTCDate : Date.prototype.getDate;
-            return method.call(new Date(year, month + 1, 0));
+            return method.call(new Date(+year, (+month) + 1, 0));
         },
         isValidModel: function (model) {
-            return !!model && (!!model.dt || model.dt === 0);
+            return !!model && (!!model.dt || model.dt === 0) && !Number.isNaN(+model.dt) && Number.isFinite(+model.dt);
         },
         isDateUpperStartLimit: function (dt, start) {
             if (!start) return true;
-            return (dt > start);
+            //TODO (S.Panfilov) should be a const
+            if ((!dt && dt !== 0) || Number.isNaN(+dt) || Number.isNaN(+start)) throw 'NaN or null';
+            //TODO (S.Panfilov) may be (+dt >= +end)
+            return (+dt > +start);
         },
         isDateLowerEndLimit: function (dt, end) {
             if (!end) return true;
-            return (dt < end);
+            //TODO (S.Panfilov) should be a const
+            if (Number.isNaN(+dt) || Number.isNaN(+end)) throw 'NaN or null';
+            //TODO (S.Panfilov) may be (+dt <= +end)
+            return (+dt < +end);
         },
         isDateBetweenLimits: function (dt, start, end) {
+            //TODO (S.Panfilov) lowerAndEqual and UpperAndEqual?
             return (exports.isDateUpperStartLimit(dt, start) && exports.isDateLowerEndLimit(dt, end));
         }
     };
+
 
     return exports;
 })(exports.Config);
@@ -114,19 +122,21 @@ exports.LimitsModel = (function (DateUtils) {
         };
 
         function _setStart(dt) {
-            exports.start.d = DateUtils.getDay(dt);
-            exports.start.m = DateUtils.getMonth(dt);
-            exports.start.y = DateUtils.getYear(dt);
-            exports.start.dt = dt;
-            return this;//TODO (S.Panfilov) Possible strict violation
+            exports.start.d = DateUtils.getDay(+dt);
+            exports.start.m = DateUtils.getMonth(+dt);
+            exports.start.y = DateUtils.getYear(+dt);
+            exports.start.dt = +dt;
+            //TODO (S.Panfilov) Possible strict violation
+            return this;
         }
 
         function _setEnd(dt) {
-            exports.end.d = DateUtils.getDay(dt);
-            exports.end.m = DateUtils.getMonth(dt);
-            exports.end.y = DateUtils.getYear(dt);
-            exports.end.dt = dt;
-            return this;//TODO (S.Panfilov) Possible strict violation
+            exports.end.d = DateUtils.getDay(+dt);
+            exports.end.m = DateUtils.getMonth(+dt);
+            exports.end.y = DateUtils.getYear(+dt);
+            exports.end.dt = +dt;
+            //TODO (S.Panfilov) Possible strict violation
+            return this;
         }
 
         function _setNow() {
@@ -135,12 +145,14 @@ exports.LimitsModel = (function (DateUtils) {
             exports.now.m = DateUtils.getMonth(dt);
             exports.now.y = DateUtils.getYear(dt);
             exports.now.dt = dt;
-            return this;//TODO (S.Panfilov) Possible strict violation
+            //TODO (S.Panfilov) Possible strict violation
+            return this;
         }
 
-        _setStart(start);
-        _setEnd(end);
+        if (start) _setStart(start);
+        if (end) _setEnd(end);
         _setNow();
+
         
         return exports;
     }
@@ -151,63 +163,107 @@ exports.DateModel = (function (DateUtils) {
     'use strict';
 
     function DateModel(dt) {
-        this.d = DateUtils.getDay(dt);
-        this.dow = DateUtils.getDayOfWeek(dt);
-        this.m = DateUtils.getMonth(dt);
-        this.y = DateUtils.getYear(dt);
-        this.dt = dt;
-        this.tz = new Date(dt).getTimezoneOffset();
+        //TODO (S.Panfilov) throwed error must be a const
+        if (!dt || Number.isNaN(+dt) || !Number.isFinite(+dt)) throw 'NaN or null';
+        this.d = DateUtils.getDay(+dt);
+        this.dow = DateUtils.getDayOfWeek(+dt);
+        this.m = DateUtils.getMonth(+dt);
+        this.y = DateUtils.getYear(+dt);
+        this.dt = +dt;
+        this.tz = new Date(+dt).getTimezoneOffset();
 
         return this;
     }
 
     return DateModel;
 })(exports.DateUtils);
-exports.YearsUtils = (function (DateUtils, CommonUtils, Config) {
+exports.YearsUtils = (function (CommonUtils, Config) {
     'use strict';
 
-    return {
-        getYearsList: function (startDt, endDt, model, limitsModel) {
-            var result = [];
-            var DEFAULT_YEARS_COUNT = Config.defaultYearsCount;
+    function _getLatestPossibleYear(yearsCount, selectedYear, now) {
+        var result = (selectedYear > now) ? selectedYear : now;
+        result += (yearsCount - 1);
+        return result;
+    }
 
-            var start = (limitsModel) ? limitsModel.start.y : null;
-            var end = (limitsModel) ? limitsModel.end.y : null;
-            var now = (limitsModel) ? limitsModel.now.y : null;
-            var selectedYear = DateUtils.getYear(model.dt);
-            var latestPossibleYear = (selectedYear > now) ? selectedYear : now;
-            var firstPossibleYear = (selectedYear < now) ? selectedYear : now;
-            latestPossibleYear += (DEFAULT_YEARS_COUNT - 1);
-            firstPossibleYear -= (DEFAULT_YEARS_COUNT - 1);
+    function _getFirstPossibleYear(yearsCount, selectedYear, now) {
+        var result = (selectedYear < now) ? selectedYear : now;
+        result -= (yearsCount - 1);
+        return result;
+    }
 
-            //TODO (S.Panfilov) why we use here limitModel's start but not startDt?
-            //TODO (S.Panfilov) Cur work point
-            if ((startDt && endDt) && (startDt < endDt)) { //start = 2011, end = 2014
-                result = CommonUtils.getArrayOfNumbers(start, end);
-            } else if ((startDt && endDt) && (startDt > endDt)) { //start = 2014, end = 2011
-                result = CommonUtils.getArrayOfNumbers(end, start);
-            } else if ((startDt && endDt) && (startDt === endDt)) { //start = 2011, end = 2011
-                result = CommonUtils.getArrayOfNumbers(start, end);
-            } else if (startDt && !endDt) {  //start = 2014, end = null
-                result = CommonUtils.getArrayOfNumbers(start, latestPossibleYear);
-            } else if (!startDt && endDt) {  //start = null, end = 2014
-                if (limitsModel.end.y >= limitsModel.now.y) {  //now = 2013 (or 2014),  end = 2014
-                    if ((firstPossibleYear - DEFAULT_YEARS_COUNT) > (end - DEFAULT_YEARS_COUNT)) {
-                        result = CommonUtils.getArrayOfNumbers(firstPossibleYear, end);
-                    } else {
-                        result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
-                    }
-                } else if (limitsModel.end.y > limitsModel.now.y) {  //now = 2015,  end = 2014
-                    result = CommonUtils.getArrayOfNumbers(end - (DEFAULT_YEARS_COUNT - 1), end);
-                }
-            } else if (!startDt && !endDt) {  //start = null, end = null
-                result = CommonUtils.getArrayOfNumbers(firstPossibleYear, latestPossibleYear);
+    function _getRangeValues(selectedYear, startYear, endYear, nowYear, yearsCount) {
+
+        var YEARS_COUNT = Config.defaultYearsCount;
+        var latestPossibleYear = _getLatestPossibleYear(YEARS_COUNT, selectedYear, nowYear);
+        var firstPossibleYear = _getFirstPossibleYear(YEARS_COUNT, selectedYear, nowYear);
+
+        var statement = {
+            isBoth: startYear && endYear,
+            isBothNot: !startYear && !endYear,
+            isOnlyStart: startYear && !endYear,
+            isOnlyEnd: !startYear && endYear,
+            isStartLower: startYear < endYear,
+            isEndLower: startYear > endYear,
+            isStartEqualEnd: startYear === endYear,
+            isEndUpperNow: endYear > nowYear,
+            isEndEqualNow: endYear === nowYear
+        };
+
+        //start = 2011, end = 2014
+        if (statement.isBoth && statement.isStartLower) {
+            return {from: startYear, to: endYear};
+        }
+
+        //start = 2014, end = 2011
+        if (statement.isBoth && statement.isEndLower) {
+            return {from: endYear, to: startYear};
+        }
+
+        //start = 2011, end = 2011
+        if (statement.isBoth && statement.isStartEqualEnd) {
+            return {from: startYear, to: endYear};
+        }
+
+        //start = 2014, end = null
+        if (statement.isOnlyStart) {
+            return {from: startYear, to: latestPossibleYear};
+        }
+
+        //start = null, now = 2013 (or 2014), end = 2014
+        if (statement.isOnlyEnd && (statement.isEndUpperNow || statement.isEndEqualNow)) {
+            //TODO (S.Panfilov) wtf? I cannot remember wtf this statement check
+            if ((firstPossibleYear - yearsCount) > (endYear - yearsCount)) {
+                return {from: firstPossibleYear, to: endYear};
+            } else {
+                return {from: endYear - (yearsCount - 1), to: endYear};
             }
+        }
+
+        //now = 2015,  end = 2014
+        if (statement.isOnlyEnd && statement.isEndUpperNow) {
+            return {from: endYear - (yearsCount - 1), to: endYear};
+        }
+
+        //start = null, end = null
+        if (statement.isBothNot) {
+            return {from: firstPossibleYear, to: latestPossibleYear};
+        }
+    }
+
+    var exports = {
+        getYearsList: function (selectedYear, startYear, endYear, nowYear) {
+            var range = _getRangeValues(selectedYear, startYear, endYear, nowYear);
+            var result = CommonUtils.getArrayOfNumbers(range.from, range.to);
 
             return CommonUtils.intArraySort(result, Config.yearsDirection);
         }
     };
-})(exports.DateUtils, exports.CommonUtils, exports.Config);
+
+
+    return exports;
+})
+(exports.CommonUtils, exports.Config);
 exports.MonthUtils = (function (DateUtils, CommonUtils, Config) {
     'use strict';
 
@@ -306,7 +362,7 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
 
     return function (model, start, end) {
 
-        var _private = {
+        var _data = {
             _start: null,
             _end: null,
             _limitDates: null
@@ -320,18 +376,18 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
                 d: null
             },
             reloadYearsList: function () {
-                exports.list.y = YearsUtils.getYearsList(_private._start, _private._end);
+                exports.list.y = YearsUtils.getYearsList(_data._start, _data._end);
                 return this;
             },
             reloadMonthList: function () {
                 var selectedYear = DateUtils.getYear(exports.selected.dt);
-                exports.list.m = MonthUtils.getMonthList(_private._start, _private._end, selectedYear);
+                exports.list.m = MonthUtils.getMonthList(_data._start, _data._end, selectedYear);
                 return this;
             },
             reloadDaysList: function () {
                 var selectedYear = DateUtils.getYear(exports.selected.dt);
                 var selectedMonth = DateUtils.getMonth(exports.selected.dt);
-                exports.list.d = DaysUtils.getDaysList(_private._start, _private._end, selectedYear, selectedMonth);
+                exports.list.d = DaysUtils.getDaysList(_data._start, _data._end, selectedYear, selectedMonth);
                 return this;
             }
         };
@@ -344,13 +400,14 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
         var selectedYear = DateUtils.getYear(exports.selected.dt);
         var selectedMonth = DateUtils.getMonth(exports.selected.dt);
 
-        _private._limitDates = new LimitsModel(start, end);
-        _private._start = start;
-        _private._end = end;
+        _data.limitsModel = new LimitsModel(start, end);
+        _data._start = start;
+        _data._end = end;
 
-        exports.list.y = YearsUtils.getYearsList(start, end, exports.selected, _private._limitDates);
-        exports.list.m = MonthUtils.getMonthList(start, end, selectedYear, _private._limitDates);
-        exports.list.d = DaysUtils.getDaysList(start, end, selectedYear, selectedMonth, exports.selected, _private._limitDates);
+        exports.list.y = YearsUtils.getYearsList(selectedYear, _data.limitsModel.start.y, _data.limitsModel.end.y, _data.limitsModel.now.y);
+        //exports.list.y = YearsUtils.getYearsList(start, end, exports.selected, _data.limitsModel);
+        exports.list.m = MonthUtils.getMonthList(start, end, selectedYear, _data.limitsModel);
+        exports.list.d = DaysUtils.getDaysList(start, end, selectedYear, selectedMonth, exports.selected, _data.limitsModel);
 
         return exports;
     };
