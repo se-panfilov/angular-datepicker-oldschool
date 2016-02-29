@@ -25,7 +25,6 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                     apdIsUtc: '=?'
                 },
                 link: function (scope) {
-
                     scope.apdIsUtc = scope.apdIsUtc || false;
 
                     //TODO (S.Panfilov) check for cross-browser support
