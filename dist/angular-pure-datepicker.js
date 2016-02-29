@@ -376,8 +376,6 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
                 d: null
             },
             reloadYearsList: function () {
-                //exports.list.y = YearsUtils.getYearsList(_data._start, _data._end);
-                //TODO (S.Panfilov) Cur work point, this is a test
                 var selectedYear = DateUtils.getYear(exports.selected.dt);
                 exports.list.y = YearsUtils.getYearsList(selectedYear, _data._start, _data._end, _data.limitsModel.now.y);
                 return this;
@@ -576,8 +574,8 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                         settings.initDateModel = getInitDateModel(scope.ngModel);
                         _initData(settings.initDateModel, settings.startDateTime, settings.endDateTime);
 
-                        scope.daysList = (scope.apdLocalization.daysList) ? scope.apdLocalization.daysList :  Config.daysList;
-                        scope.monthList = (scope.apdLocalization.monthList) ? scope.apdLocalization.monthList :  Config.monthList;
+                        scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList :  Config.daysList;
+                        scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList :  Config.monthList;
 
                         ngModelWatcher.start(onModelChange);
                     })();

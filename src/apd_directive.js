@@ -156,8 +156,8 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                         settings.initDateModel = getInitDateModel(scope.ngModel);
                         _initData(settings.initDateModel, settings.startDateTime, settings.endDateTime);
 
-                        scope.daysList = (scope.apdLocalization.daysList) ? scope.apdLocalization.daysList :  Config.daysList;
-                        scope.monthList = (scope.apdLocalization.monthList) ? scope.apdLocalization.monthList :  Config.monthList;
+                        scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList :  Config.daysList;
+                        scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList :  Config.monthList;
 
                         ngModelWatcher.start(onModelChange);
                     })();
