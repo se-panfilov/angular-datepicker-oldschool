@@ -19,7 +19,7 @@ html#ng-app(xmlns:ng='http://angularjs.org', ng-app='demo', lang='en')
         #content_view.container
             #demo_page(ng-controller="DemoPageCtrl")
                 ol
-                    li
+                    //li
                         section
                             h3 Common case
                             .case_description
@@ -41,7 +41,7 @@ html#ng-app(xmlns:ng='http://angularjs.org', ng-app='demo', lang='en')
                                     label.control-label(for="apd_1") Дата
                                     pure-datepicker#apd_1(ng-model="commonCase.model", apd-localization="localized")
                             model-well(case-model="commonCase")
-                    li
+                    //li
                         section
                             h3 Both-sided limits and valid model
                             .case_description
@@ -79,7 +79,7 @@ html#ng-app(xmlns:ng='http://angularjs.org', ng-app='demo', lang='en')
                                     label.control-label(for="apd_1") Date
                                     pure-datepicker#apd_1(ng-model="rightLimitsCase.model", apd-end="rightLimitsCase.end")
                             model-well(case-model="rightLimitsCase")
-                    //li
+                    li
                         section
                             h3 Right-side limit and valid model (but model out of limits)
                             .case_description
