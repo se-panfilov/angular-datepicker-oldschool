@@ -29,7 +29,7 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                     scope.apdIsUtc = scope.apdIsUtc || false;
 
                     //TODO (S.Panfilov) check for cross-browser support
-                    //TODO (S.Panfilov) may be should add tests
+                    //TODO (S.Panfilov) should add tests probably
                     var settings = {
                         initDateModel: null,
                         startDateTime: null,

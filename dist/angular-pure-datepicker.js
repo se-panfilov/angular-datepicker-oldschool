@@ -376,7 +376,10 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
                 d: null
             },
             reloadYearsList: function () {
-                exports.list.y = YearsUtils.getYearsList(_data._start, _data._end);
+                //exports.list.y = YearsUtils.getYearsList(_data._start, _data._end);
+                //TODO (S.Panfilov) Cur work point, this is a test
+                var selectedYear = DateUtils.getYear(exports.selected.dt);
+                exports.list.y = YearsUtils.getYearsList(selectedYear, _data._start, _data._end, _data.limitsModel.now.y);
                 return this;
             },
             reloadMonthList: function () {
@@ -405,7 +408,6 @@ exports.DataClass = (function (DateUtils, CommonUtils, YearsUtils, MonthUtils, D
         _data._end = end;
 
         exports.list.y = YearsUtils.getYearsList(selectedYear, _data.limitsModel.start.y, _data.limitsModel.end.y, _data.limitsModel.now.y);
-        //exports.list.y = YearsUtils.getYearsList(start, end, exports.selected, _data.limitsModel);
         exports.list.m = MonthUtils.getMonthList(start, end, selectedYear, _data.limitsModel);
         exports.list.d = DaysUtils.getDaysList(start, end, selectedYear, selectedMonth, exports.selected, _data.limitsModel);
 
@@ -447,7 +449,7 @@ var angularView = (function (DateUtils, DataClass, Config, DateModel) {
                     scope.apdIsUtc = scope.apdIsUtc || false;
 
                     //TODO (S.Panfilov) check for cross-browser support
-                    //TODO (S.Panfilov) may be should add tests
+                    //TODO (S.Panfilov) should add tests probably
                     var settings = {
                         initDateModel: null,
                         startDateTime: null,
