@@ -9,8 +9,8 @@ var src = {
     jade: 'src/templates/**/*.jade',
     js: 'src/*.js',
     //TODO (S.Panfilov) make different tasks for release and dev build
-    coreJs: './bower_components/x-date-core/dist/x-date-core.js' //release core path
-    //coreJs: '../x-date-core/dist/x-date-core.js' //dev core path
+    //coreJs: './bower_components/x-date-core/dist/x-date-core.js' //release core path
+    coreJs: '../x-date-core/dist/x-date-core.js' //dev core path
 };
 
 var dest = {
