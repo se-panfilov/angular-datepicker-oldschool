@@ -51,31 +51,22 @@ var xDateCore = function(selectedDt, startDt, endDt) {
         }
       }
     },
-    ListsState: function() {
-      var exports = {
-        list: {
-          y: null,
-          m: null,
-          d: null
-        },
-        reloadYearsList: function() {
-          exports.list.y = x.YearsUtils.getYearsList();
-        },
-        reloadMonthList: function() {
-          exports.list.m = x.MonthUtils.getMonthList();
-        },
-        reloadDaysList: function() {
-          exports.list.d = x.DaysUtils.getDaysList();
-        }
-      };
-
-      exports.list.y = x.YearsUtils.getYearsList();
-      exports.list.m = x.MonthUtils.getMonthList();
-      exports.list.d = x.DaysUtils.getDaysList();
-
-      //TODO (S.Panfilov) perhaps we should watch model and limits value here and update them
-
-      return exports;
+    ListsState: {
+      list: {},
+      reloadDaysList: function() {
+        this.list.d = x.DaysUtils.getDaysList();
+      },
+      reloadMonthList: function() {
+        this.list.m = x.MonthUtils.getMonthList();
+      },
+      reloadYearsList: function() {
+        this.list.y = x.YearsUtils.getYearsList();
+      },
+      initList: function() {
+        this.reloadDaysList();
+        this.reloadMonthList();
+        this.reloadYearsList();
+      }
     },
 
     DateModel:
@@ -226,9 +217,9 @@ var xDateCore = function(selectedDt, startDt, endDt) {
 
         if ((isUpperStart || isEqualStart) || (isLowerEnd || isEqualEnd)) {
           result = dt;
-        } else if (!isUpperStart) { //start == 1; model == 0
+        } else if (!isUpperStart && this.start.isExist) { //start == 1; model == 0
           result = this.start;
-        } else if (!isUpperStart) { //model == 4; end == 3;
+        } else if (!isLowerEnd && this.end.isExist) { //model == 4; end == 3;
           result = this.end.dt;
         } else { //paranoid case
           result = +(new Date());
@@ -503,11 +494,11 @@ angular.module('angular-pd', [
             var endDt = getDt(scope.apdEnd);
 
             x = new xDateCore(modelDt, startDt, endDt);
-
+            x.ListsState.initList();
             scope.lists = {
-              d: x.ListsState.list.day,
-              m: x.ListsState.list.month,
-              y: x.ListsState.list.year
+              d: x.ListsState.list.d,
+              m: x.ListsState.list.m,
+              y: x.ListsState.list.y
             };
 
             scope.ngModel = copyObj(x.State.selected);
@@ -577,4 +568,4 @@ angular.module('angular-pd', [
       }
     })
 ;
-angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=lists.d ng-options=\"day for day in data.list.d\" ng-init=\"data.selected.d = data.list.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[lists.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=lists.m ng-options=\"monthList[month] for month in data.list.m\" ng-init=\"data.selected.m = data.list.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=lists.y ng-options=\"year for year in data.list.y\" ng-init=\"data.selected.y = data.list.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);
+angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=selected.d ng-options=\"day for day in lists.d\" ng-init=\"selected.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[lists.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=selected.m ng-options=\"monthList[month] for month in list.m\" ng-init=\"selected.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=selected.y ng-options=\"year for year in list.y\" ng-init=\"selected.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);

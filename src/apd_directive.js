@@ -90,11 +90,11 @@ angular.module('angular-pd', [
             var endDt = getDt(scope.apdEnd);
 
             x = new xDateCore(modelDt, startDt, endDt);
-
+            x.ListsState.initList();
             scope.lists = {
-              d: x.ListsState.list.day,
-              m: x.ListsState.list.month,
-              y: x.ListsState.list.year
+              d: x.ListsState.list.d,
+              m: x.ListsState.list.m,
+              y: x.ListsState.list.y
             };
 
             scope.ngModel = copyObj(x.State.selected);
