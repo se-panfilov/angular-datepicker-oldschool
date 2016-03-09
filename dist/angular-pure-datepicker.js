@@ -504,7 +504,6 @@ angular.module('angular-pd', [
             scope.ngModel = copyObj(x.State.selected);
           }
 
-
           var isUpdateFromCore = false;
 
           //scope.$watch('ngModel', function (newModel, oldModel) {
@@ -558,8 +557,8 @@ angular.module('angular-pd', [
           (function _init() {
             _initData();
 
-            //scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList : Config.daysList;
-            //scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList : Config.monthList;
+            scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList : x.Config.daysList;
+            scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList : x.Config.monthList;
 
             //ngModelWatcher.start(onModelChange);
           })();
@@ -568,4 +567,4 @@ angular.module('angular-pd', [
       }
     })
 ;
-angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=selected.d ng-options=\"day for day in lists.d\" ng-init=\"selected.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[lists.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=selected.m ng-options=\"monthList[month] for month in list.m\" ng-init=\"selected.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=selected.y ng-options=\"year for year in list.y\" ng-init=\"selected.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);
+angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=selected.d ng-options=\"day for day in lists.d\" ng-init=\"selected.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[lists.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=selected.m ng-options=\"monthList[month] for month in lists.m\" ng-init=\"selected.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=selected.y ng-options=\"year for year in lists.y\" ng-init=\"selected.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);

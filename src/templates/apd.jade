@@ -9,11 +9,11 @@
     )
     select.apd_elem.apd_select_month.apd_select(
     ng-model="selected.m"
-    ng-options="monthList[month] for month in list.m"
+    ng-options="monthList[month] for month in lists.m"
     ng-init="selected.m = lists.m[0]"
     )
     select.apd_elem.apd_select_year.apd_select(
     ng-model="selected.y"
-    ng-options="year for year in list.y"
+    ng-options="year for year in lists.y"
     ng-init="selected.y = lists.y[0]"
     )

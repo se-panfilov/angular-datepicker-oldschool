@@ -100,7 +100,6 @@ angular.module('angular-pd', [
             scope.ngModel = copyObj(x.State.selected);
           }
 
-
           var isUpdateFromCore = false;
 
           //scope.$watch('ngModel', function (newModel, oldModel) {
@@ -154,8 +153,8 @@ angular.module('angular-pd', [
           (function _init() {
             _initData();
 
-            //scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList : Config.daysList;
-            //scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList : Config.monthList;
+            scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList : x.Config.daysList;
+            scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList : x.Config.monthList;
 
             //ngModelWatcher.start(onModelChange);
           })();
