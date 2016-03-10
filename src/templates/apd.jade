@@ -1,19 +1,19 @@
 .apd_root
     select.apd_elem.apd_select_day.apd_select(
-    ng-model="selected.d"
+    ng-model="ngModel.d"
     ng-options="day for day in lists.d"
-    ng-init="selected.d = lists.d[0]"
+    ng-init="ngModel.d = lists.d[0]"
     )
     span.apd_elem.apd_day_of_week(
-    ng-bind="daysList[lists.dow]"
+    ng-bind="daysList[ngModel.dow]"
     )
     select.apd_elem.apd_select_month.apd_select(
-    ng-model="selected.m"
+    ng-model="ngModel.m"
     ng-options="monthList[month] for month in lists.m"
-    ng-init="selected.m = lists.m[0]"
+    ng-init="ngModel.m = lists.m[0]"
     )
     select.apd_elem.apd_select_year.apd_select(
-    ng-model="selected.y"
+    ng-model="ngModel.y"
     ng-options="year for year in lists.y"
-    ng-init="selected.y = lists.y[0]"
+    ng-init="ngModel.y = lists.y[0]"
     )

@@ -100,22 +100,21 @@ angular.module('angular-pd', [
             scope.ngModel = copyObj(x.State.selected);
           }
 
-          var isUpdateFromCore = false;
+          scope.isUpdateFromCore = false;
 
           scope.$watch('ngModel', function (newModel, oldModel) {
 
             if (!x) return;
             if (!x.DateUtils.isValidModel(newModel)) return;
             if (newModel.dt === oldModel.dt) return;
-            if (isUpdateFromCore) return; //TODO (S.Panfilov) This doesn't work. Perhaps stop watching is a best solution
+            if (scope.isUpdateFromCore) return; //TODO (S.Panfilov) This doesn't work. Perhaps stop watching is a best solution
 
-            isUpdateFromCore = true;
+            scope.isUpdateFromCore = true;
             x.State.setSelected(newModel.dt);
             scope.ngModel = copyObj(x.State.selected);
-            isUpdateFromCore = false;
+            scope.isUpdateFromCore = false;
 
           }, true);
-
 
           //scope.onDaySelectChanged = function (day) {
           //  if (!day) return;

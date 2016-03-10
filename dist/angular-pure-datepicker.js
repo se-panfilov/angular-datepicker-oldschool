@@ -180,51 +180,62 @@ var xDateCore = function(selectedDt, startDt, endDt) {
 
     State: {
       selected: {}, //TODO (S.Panfilov) refactor selected
-      setSelected: function(dt) {
+      setSelected: function(dt, isForce) {
         var result;
+        var self = this;
 
-        var cases = {
-          isDtUpperStart: (dt > this.start.dt),
+        if (isForce) {
+          this.selected = new x.DateModel(dt);
+          return;
+        }
+
+        var c = {
+          isStart: self.start.isExist,
+          isEnd: self.end.isExist,
+          isDtBeyondStart: (dt > this.start.dt),
           isDtEqualStart: (dt === this.start.dt),
-          isDtLowerEnd: (dt > this.end.dt),
+          isDtBeyondEnd: (dt > this.end.dt),
           isDtEqualEnd: (dt === this.end.dt)
         };
-
-        //if (!this.start.isExist && !this.end.isExist) { //start == null; model == 1; end == null
+        //
+        //if (c.isStart && !c.isEnd && !c.isDtBeyondStart) {//start == 1; model == 0
+        //  result = this.start.dt;
+        //} else if (!c.isStart && c.isEnd && !c.isDtBeyondEnd) {//model == 4; end == 3;
+        //  result = this.end.dt;
+        //} else {
         //  result = dt;
-        //} else if (this.start.isExist && this.end.isExist) {//Start Limit
-        //  if (!cases.isDtUpperStart) { //start == 1; model == 0
+        //}
+
+
+        if (c.isStart || c.isEnd) {
+          if (!c.isDtBeyondStart) { //start == 1; model == 0
+            result = this.start.dt;
+          } else if (!c.isDtBeyondEnd) {
+            result = this.end.dt;
+          }
+        } else {
+          result = dt;
+        }
+
+        //if (!c.isStart && !c.isEnd) { //start == null; model == 1; end == null
+        //  result = dt;
+        //} else if (c.isStart && !c.isEnd) {//Start Limit
+        //  if (!c.isDtBeyondStart) { //start == 1; model == 0
         //    result = this.start.dt;
         //  } else {
         //    result = dt;//start == 1; model == 1 or 2
         //  }
-        //} else if (!this.start.isExist && this.end.isExist) {//End Limit
-        //  if (!cases.isDtLowerEnd) { //model == 4; end == 3;
+        //} else if (!c.isStart && c.isEnd) {//End Limit
+        //  if (!c.isDtBeyondEnd) { //model == 4; end == 3;
         //    result = this.end.dt;
         //  } else {
         //    result = dt;//model == 2 or 3; end == 3;
         //  }
-        //} else if (this.start.isExist && this.end.isExist) {//Both Limits
-        //  if ((cases.isDtUpperStart || cases.isDtEqualStart) || (cases.isDtLowerEnd || cases.isDtEqualEnd)) {//start == 1; model == 1 or 2 or 3; end == 3;
+        //} else if (c.isStart && c.isEnd) {//Both Limits
+        //  if ((c.isDtBeyondStart || c.isDtEqualStart) || (c.isDtBeyondEnd || c.isDtEqualEnd)) {//start == 1; model == 1 or 2 or 3; end == 3;
         //    result = dt;
         //  }
         //}
-
-        var isUpperStart = (dt > this.start.dt);
-        var isEqualStart = (dt === this.start.dt);
-        var isLowerEnd = (dt > this.end.dt);
-        var isEqualEnd = (dt === this.end.dt);
-
-        if ((isUpperStart || isEqualStart) || (isLowerEnd || isEqualEnd)) {
-          result = dt;
-        } else if (!isUpperStart && this.start.isExist) { //start == 1; model == 0
-          result = this.start;
-        } else if (!isLowerEnd && this.end.isExist) { //model == 4; end == 3;
-          result = this.end.dt;
-        } else { //paranoid case
-          result = +(new Date());
-        }
-
 
         this.selected = new x.DateModel(result);
       },
@@ -232,13 +243,13 @@ var xDateCore = function(selectedDt, startDt, endDt) {
       setStart: function(dt) {
         if (!dt && dt !== 0) return;
         this.start = new x.DateModel(dt);
-        this.start.isExist = true;
+        cases.isStart = true;
       },
       end: {},
       setEnd: function(dt) {
         if (!dt && dt !== 0) return;
         this.end = new x.DateModel(dt);
-        this.end.isExist = true;
+        cases.isEnd = true;
       },
       setLimits: function(start, end) {
         this.setStart(start);
@@ -504,22 +515,21 @@ angular.module('angular-pd', [
             scope.ngModel = copyObj(x.State.selected);
           }
 
-          var isUpdateFromCore = false;
+          scope.isUpdateFromCore = false;
 
           scope.$watch('ngModel', function (newModel, oldModel) {
 
             if (!x) return;
             if (!x.DateUtils.isValidModel(newModel)) return;
             if (newModel.dt === oldModel.dt) return;
-            if (isUpdateFromCore) return; //TODO (S.Panfilov) This doesn't work. Perhaps stop watching is a best solution
+            if (scope.isUpdateFromCore) return; //TODO (S.Panfilov) This doesn't work. Perhaps stop watching is a best solution
 
-            isUpdateFromCore = true;
+            scope.isUpdateFromCore = true;
             x.State.setSelected(newModel.dt);
             scope.ngModel = copyObj(x.State.selected);
-            isUpdateFromCore = false;
+            scope.isUpdateFromCore = false;
 
           }, true);
-
 
           //scope.onDaySelectChanged = function (day) {
           //  if (!day) return;
@@ -567,4 +577,4 @@ angular.module('angular-pd', [
       }
     })
 ;
-angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=selected.d ng-options=\"day for day in lists.d\" ng-init=\"selected.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[lists.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=selected.m ng-options=\"monthList[month] for month in lists.m\" ng-init=\"selected.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=selected.y ng-options=\"year for year in lists.y\" ng-init=\"selected.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);
+angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=ngModel.d ng-options=\"day for day in lists.d\" ng-init=\"ngModel.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[ngModel.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=ngModel.m ng-options=\"monthList[month] for month in lists.m\" ng-init=\"ngModel.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=ngModel.y ng-options=\"year for year in lists.y\" ng-init=\"ngModel.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);
