@@ -193,18 +193,8 @@ var xDateCore = function(selectedDt, startDt, endDt) {
           isStart: self.start.isExist,
           isEnd: self.end.isExist,
           isDtBeyondStart: (dt > this.start.dt),
-          isDtEqualStart: (dt === this.start.dt),
-          isDtBeyondEnd: (dt > this.end.dt),
-          isDtEqualEnd: (dt === this.end.dt)
+          isDtBeyondEnd: (dt > this.end.dt)
         };
-        //
-        //if (c.isStart && !c.isEnd && !c.isDtBeyondStart) {//start == 1; model == 0
-        //  result = this.start.dt;
-        //} else if (!c.isStart && c.isEnd && !c.isDtBeyondEnd) {//model == 4; end == 3;
-        //  result = this.end.dt;
-        //} else {
-        //  result = dt;
-        //}
 
 
         if (c.isStart || c.isEnd) {
@@ -216,26 +206,6 @@ var xDateCore = function(selectedDt, startDt, endDt) {
         } else {
           result = dt;
         }
-
-        //if (!c.isStart && !c.isEnd) { //start == null; model == 1; end == null
-        //  result = dt;
-        //} else if (c.isStart && !c.isEnd) {//Start Limit
-        //  if (!c.isDtBeyondStart) { //start == 1; model == 0
-        //    result = this.start.dt;
-        //  } else {
-        //    result = dt;//start == 1; model == 1 or 2
-        //  }
-        //} else if (!c.isStart && c.isEnd) {//End Limit
-        //  if (!c.isDtBeyondEnd) { //model == 4; end == 3;
-        //    result = this.end.dt;
-        //  } else {
-        //    result = dt;//model == 2 or 3; end == 3;
-        //  }
-        //} else if (c.isStart && c.isEnd) {//Both Limits
-        //  if ((c.isDtBeyondStart || c.isDtEqualStart) || (c.isDtBeyondEnd || c.isDtEqualEnd)) {//start == 1; model == 1 or 2 or 3; end == 3;
-        //    result = dt;
-        //  }
-        //}
 
         this.selected = new x.DateModel(result);
       },
@@ -434,61 +404,6 @@ angular.module('angular-pd', [
         link: function (scope) {
           scope.apdIsUtc = scope.apdIsUtc || false;
 
-          //var ngModelWatcher = {
-          //  handler: null,
-          //  start: function (callback) {
-          //    ngModelWatcher.handler = scope.$watch('ngModel.dt', function (value, oldValue) {
-          //      if (callback) {
-          //        callback(value, oldValue)
-          //      }
-          //
-          //    }, true);
-          //  },
-          //  stop: function () {
-          //    ngModelWatcher.handler();
-          //    return true;
-          //  }
-          //};
-
-          //function getLimitSafeDatetime(day, month, year) {
-          //
-          //  var datetime = new Date(year, month, day).getTime();
-          //
-          //  if (!x.DateUtils.isDateBetweenLimits(datetime, settings.startDateTime, settings.endDateTime)) {
-          //    if (!x.DateUtils.isDateUpperStartLimit(datetime, settings.startDateTime)) {
-          //      datetime = settings.startDateTime;
-          //    } else if (!x.DateUtils.isDateLowerEndLimit(datetime, settings.endDateTime)) {
-          //      datetime = settings.endDateTime;
-          //    }
-          //  }
-          //
-          //  return datetime;
-          //}
-
-          //function updateModel(datetime) {
-          //  ngModelWatcher.stop();
-          //  scope.data.selected = new DateModel(datetime);
-          //  scope.ngModel = scope.data.selected;
-          //  ngModelWatcher.start(onModelChange);
-          //}
-
-          //function onModelChange(datetime, oldValue) {
-          //  if (datetime === oldValue) {
-          //    return;
-          //  }
-          //
-          //  var day = x.DateUtils.getDay(datetime);
-          //  var month = x.DateUtils.getMonth(datetime);
-          //  var year = x.DateUtils.getYear(datetime);
-          //
-          //  datetime = getLimitSafeDatetime(day, month, year);
-          //  updateModel(datetime);
-          //
-          //  scope.data.reloadYearsList();
-          //  scope.data.reloadMonthList();
-          //  scope.data.reloadDaysList();
-          //}
-
           function copyObj(obj) {
             return JSON.parse(JSON.stringify(obj));
           }
@@ -531,50 +446,18 @@ angular.module('angular-pd', [
 
           }, true);
 
-          //scope.onDaySelectChanged = function (day) {
-          //  if (!day) return;
-          //
-          //  var datetime = getLimitSafeDatetime(scope.data.selected.d, scope.data.selected.m, scope.data.selected.y);
-          //  updateModel(datetime);
-          //};
-          //
-          //scope.onMonthSelectChanged = function (month) {
-          //  if (!month && month !== 0) return;
-          //
-          //  var datetime;
-          //  var year = scope.data.selected.y;
-          //  var day = scope.data.selected.d;
-          //
-          //  datetime = getLimitSafeDatetime(day, month, year);
-          //  updateModel(datetime);
-          //
-          //  scope.data.reloadDaysList();
-          //};
-          //
-          //scope.onYearSelectChanged = function (year) {
-          //  if (!year && year !== 0) return;
-          //
-          //  var month = scope.data.selected.m;
-          //  var day = scope.data.selected.d;
-          //
-          //  var datetime = getLimitSafeDatetime(day, month, year);
-          //  updateModel(datetime);
-          //
-          //  scope.data.reloadMonthList();
-          //  scope.data.reloadDaysList();
-          //};
+          scope.onSelectChanged = function () {
+            scope.ngModel.dt = +(new Date(scope.ngModel.y, scope.ngModel.m, scope.ngModel.d));
+          };
 
           (function _init() {
             _initData();
-
             scope.daysList = (scope.apdLocalization && scope.apdLocalization.daysList) ? scope.apdLocalization.daysList : x.Config.daysList;
             scope.monthList = (scope.apdLocalization && scope.apdLocalization.monthList) ? scope.apdLocalization.monthList : x.Config.monthList;
-
-            //ngModelWatcher.start(onModelChange);
           })();
 
         }
       }
     })
 ;
-angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=ngModel.d ng-options=\"day for day in lists.d\" ng-init=\"ngModel.d = lists.d[0]\" class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[ngModel.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=ngModel.m ng-options=\"monthList[month] for month in lists.m\" ng-init=\"ngModel.m = lists.m[0]\" class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=ngModel.y ng-options=\"year for year in lists.y\" ng-init=\"ngModel.y = lists.y[0]\" class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);
+angular.module("angular-pd.templates", []).run(["$templateCache", function($templateCache) {$templateCache.put("apd.html","<div class=apd_root><select ng-model=ngModel.d ng-options=\"day for day in lists.d\" ng-init=\"ngModel.d = lists.d[0]\" ng-change=onSelectChanged() class=\"apd_elem apd_select_day apd_select\"></select><span ng-bind=daysList[ngModel.dow] class=\"apd_elem apd_day_of_week\"></span><select ng-model=ngModel.m ng-options=\"monthList[month] for month in lists.m\" ng-init=\"ngModel.m = lists.m[0]\" ng-change=onSelectChanged() class=\"apd_elem apd_select_month apd_select\"></select><select ng-model=ngModel.y ng-options=\"year for year in lists.y\" ng-init=\"ngModel.y = lists.y[0]\" ng-change=onSelectChanged() class=\"apd_elem apd_select_year apd_select\"></select></div>");}]);

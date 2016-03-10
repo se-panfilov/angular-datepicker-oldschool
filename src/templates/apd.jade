@@ -3,6 +3,7 @@
     ng-model="ngModel.d"
     ng-options="day for day in lists.d"
     ng-init="ngModel.d = lists.d[0]"
+    ng-change="onSelectChanged()"
     )
     span.apd_elem.apd_day_of_week(
     ng-bind="daysList[ngModel.dow]"
@@ -11,9 +12,11 @@
     ng-model="ngModel.m"
     ng-options="monthList[month] for month in lists.m"
     ng-init="ngModel.m = lists.m[0]"
+    ng-change="onSelectChanged()"
     )
     select.apd_elem.apd_select_year.apd_select(
     ng-model="ngModel.y"
     ng-options="year for year in lists.y"
     ng-init="ngModel.y = lists.y[0]"
+    ng-change="onSelectChanged()"
     )
